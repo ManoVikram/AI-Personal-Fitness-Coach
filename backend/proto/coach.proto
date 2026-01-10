@@ -2,25 +2,25 @@ syntax = "proto3";
 
 package coachpb;
 
-option go_package = "github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/proto";
+option go_package = "github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/proto/coachpb;coachpb";
 
 //=============================================
 // Service 1 - Coach Chat
 //=============================================
-service CoachChat {
+service CoachChatService {
     rpc SendMessage(ChatRequest) returns (ChatResponse);
 }
 
 message ChatRequest {
     string user_id = 1;
-    string messsage = 2;
+    string message = 2;
     UserProfile user_profile = 3;
     repeated ChatMessage chat_history = 4;
 }
 
 message ChatResponse {
     string message = 1;
-    string tokens_used = 2;
+    int32 tokens_used = 2;
 }
 
 message ChatMessage {
@@ -32,7 +32,7 @@ message ChatMessage {
 //=============================================
 // Service 2 - Workout Generator
 //=============================================
-service WorkoutGenerator {
+service WorkoutGeneratorService {
     rpc GenerateWorkout(WorkoutRequest) returns (WorkoutPlan);
 }
 
@@ -61,17 +61,17 @@ message Exercise {
 //=============================================
 // Service 3 - Progress Analyzer
 //=============================================
-service ProgressAnalyzer {
+service ProgressAnalyzerService {
     rpc AnalyzeProgress(ProgressRequest) returns (InsightResponse);
 }
 
 message ProgressRequest {
     string user_id = 1;
     repeated WorkoutLog workout_logs = 2;   // Last 30 days of data
-    userProfile user_profile = 3;
+    UserProfile user_profile = 3;
 }
 
-message InsightResposne {
+message InsightResponse {
     string summary = 1;
     repeated Insight insights = 2;
     repeated string recommendations = 3;
@@ -92,7 +92,7 @@ message UserProfile {
     int32 age = 3;
     string fitness_goal = 4;        // Ex: "build_muscle" or "loose weight" or "general_fitness"
     string fitness_level = 5;       // Ex: "beginner" or "intermediate" or "advanced"
-    repated string equipment = 6;   // Ex: ["dumbbells", "barbell", "pull_up_bar"]
+    repeated string equipment = 6;   // Ex: ["dumbbells", "barbell", "pull_up_bar"]
     string gender = 7;
 }
 
