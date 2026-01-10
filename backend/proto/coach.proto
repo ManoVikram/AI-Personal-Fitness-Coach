@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+package coachpb;
+
+option go_package = "github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/proto";
+
+//=============================================
+// Service 1 - Coach Chat
+//=============================================
+service CoachChat {
+    rpc SendMessage(ChatRequest) returns (ChatResponse);
+}
+
+message ChatRequest {
+    string user_id = 1;
+    string messsage = 2;
+    UserProfile user_profile = 3;
+    repeated ChatMessage chat_history = 4;
+}
+
+message ChatResponse {
+    string message = 1;
+    string tokens_used = 2;
+}
+
+message ChatMessage {
+    string role = 1;    // Ex: "user" or "assistant"
+    string content = 2;
+    string timestamp = 3;
+}
+
+//=============================================
+// Service 2 - Workout Generator
+//=============================================
+service WorkoutGenerator {
+    rpc GenerateWorkout(WorkoutRequest) returns (WorkoutPlan);
+}
+
+message WorkoutRequest {
+    string user_id = 1;
+    UserProfile user_profile = 2;
+    string workout = 3;     // Ex: "full-body" or "upper" or "lower"
+}
+
+message WorkoutPlan {
+    string day = 1;
+    string focus = 2;       // Ex: "Upper body strength" 
+    repeated Exercise exercise = 3;
+    int32 total_duration_mins = 4;
+    string difficulty = 5;  // Ex: "beginner" or "intermediate" or "advanced"
+}
+
+message Exercise {
+    string name = 1;
+    int32 sets = 2;
+    string reps = 3;    // Ex: "8-12 reps" or "to failure"
+    int32 rest_seconds = 4;
+    string notes = 5;
+}
+
+//=============================================
+// Service 3 - Progress Analyzer
+//=============================================
+service ProgressAnalyzer {
+    rpc AnalyzeProgress(ProgressRequest) returns (InsightResponse);
+}
+
+message ProgressRequest {
+    string user_id = 1;
+    repeated WorkoutLog workout_logs = 2;   // Last 30 days of data
+    userProfile user_profile = 3;
+}
+
+message InsightResposne {
+    string summary = 1;
+    repeated Insight insights = 2;
+    repeated string recommendations = 3;
+}
+
+message Insight {
+    string category = 1;        // Ex: "strength_trend" or "consistency" or "recovery"
+    string observation = 2;
+    string impact = 3;          // Ex: "positive", "neutral", "needs_attention"
+}
+
+//=============================================
+// Shared Models
+//=============================================
+message UserProfile {
+    string user_id = 1;
+    string name = 2;
+    int32 age = 3;
+    string fitness_goal = 4;        // Ex: "build_muscle" or "loose weight" or "general_fitness"
+    string fitness_level = 5;       // Ex: "beginner" or "intermediate" or "advanced"
+    repated string equipment = 6;   // Ex: ["dumbbells", "barbell", "pull_up_bar"]
+    string gender = 7;
+}
+
+message WorkoutLog {
+    string log_id = 1;
+    string date = 2;    // ISO format: "2026-01-10"
+    repeated ExerciseLog exercise_logs = 3;
+    int32 duration_mins = 4;
+    string notes = 5;
+}
+
+message ExerciseLog {
+    string name = 1;
+    repeated int32 reps_per_set = 2;
+    repeated int32 weight_per_set = 3;  // in kg
+    string notes = 4;
+}
