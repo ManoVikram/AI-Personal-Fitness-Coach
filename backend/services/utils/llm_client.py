@@ -28,3 +28,12 @@ class LLMClient:
         Used for workout generation, etc.
         """
         return LLMClient.get_chat_assistant(temperature=0.3, model=model)
+    
+    @staticmethod
+    def get_creative_model(model="gpt-4o-mini"):
+        """
+        Get a model for creative / conversational output
+
+        Used for chat, insights, etc.
+        """
+        return LLMClient.get_chat_assistant(temperature=0.7, model=model)
