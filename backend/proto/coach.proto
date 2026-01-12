@@ -92,7 +92,7 @@ message UserProfile {
     int32 age = 3;
     string fitness_goal = 4;        // Ex: "build_muscle" or "loose weight" or "general_fitness"
     string fitness_level = 5;       // Ex: "beginner" or "intermediate" or "advanced"
-    repeated string equipments = 6; // Ex: ["dumbbells", "barbell", "pull_up_bar"]
+    repeated string equipment = 6;   // Ex: ["dumbbells", "barbell", "pull_up_bar"]
     string gender = 7;
 }
 
