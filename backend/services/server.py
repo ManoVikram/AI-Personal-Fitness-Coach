@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import grpc
 from dotenv import load_dotenv
+from servicer import CoachChatService
 from proto import coach_pb2_grpc
 
 logging.basicConfig(level=logging.INFO)
