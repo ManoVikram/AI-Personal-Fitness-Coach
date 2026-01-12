@@ -74,12 +74,12 @@ class CoachChatService(coach_pb2_grpc.CoachChatServiceServicer):
             messages.append(HumanMessage(content=request.message))
 
             # Step 4 - Get the response from the LLM
-            response = self.llm.invoke(messages=messages)
+            response = self.llm.invoke(input=messages)
 
             # Step 5 - Return the response as ChatResponse
             return coach_pb2.ChatResponse(
                 message=response.content,
-                tokens_used=response.usage_metadata.total_tokens
+                tokens_used=response.usage_metadata["total_tokens"]
             )
         except Exception as error:
             context.set_code(grpc.StatusCode.INTERNAL)
