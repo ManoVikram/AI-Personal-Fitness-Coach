@@ -1,6 +1,9 @@
 import logging
-from utils.llm_client import LLMClient
+
+import grpc
+from langchain.messages import AIMessage, HumanMessage, SystemMessage
 from proto import coach_pb2, coach_pb2_grpc
+from utils.llm_client import LLMClient
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -44,9 +47,47 @@ class CoachChatService(coach_pb2_grpc.CoachChatServiceServicer):
         """
         
         return prompt
+    
+    def _create_chat_history(self, chat_history):
+        """
+        Convert protobuf ChatMessage objects to LangChain messages
+        """
+        messages = []
+        for message in chat_history:
+            if message.role == "user":
+                messages.append(HumanMessage(content=message.content))
+            elif message.role == "assistant":
+                messages.append(AIMessage(content=message.content))
+
+        return messages
 
     def SendMessage(self, request, context):
         try:
-            pass
+            # Step 1 - Build the system prompt
+            system_prompt = self._build_system_prompt(request.user_profile)
+
+            # Step 2 - Convert chat history to LangChain messages format
+            messages = [SystemMessage(content=system_prompt)]
+            messages.extend(self._create_chat_history(chat_history=request.chat_history))
+
+            # Step 3 - Add the new user message
+            messages.append(HumanMessage(content=request.message))
+
+            # Step 4 - Get the response from the LLM
+            response = self.llm.invoke(messages=messages)
+
+            # Step 5 - Return the response as ChatResponse
+            return coach_pb2.ChatResponse(
+                message=response.content,
+                tokens_used=response.usage_metadata.total_tokens
+            )
         except Exception as error:
-            pass 
+            context.set_code(grpc.StatusCode.INTERNAL)
+            error_details = f"Error processing response: {str(error)}"
+            context.set_details(error_details)
+            logger.error(error_details)
+            
+            return coach_pb2.ChatResponse(
+                message="",
+                tokens_used=0
+            )
