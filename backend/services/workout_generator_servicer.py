@@ -1,4 +1,5 @@
 import logging
+from typing import List
 from proto import coach_pb2, coach_pb2_grpc
 from utils.llm_client import LLMClient
 from langchain_core.output_parsers import PydanticOutputParser
@@ -25,7 +26,7 @@ class WorkoutPlanModel(BaseModel):
     """
     day: str = Field(description="Day of the week for the workout (ex: Monday, etc.)")
     focus: str = Field(description="Focus area of the workout (ex: Upper Body, Cardio, etc.)")
-    exercise: ExerciseModel = Field(description="Details of the exercise")
+    exercises: List[ExerciseModel] = Field(description="Details of the exercise")
     total_duration_mins: int = Field(description="Total duration of the workout in minutes", ge=15, le=120)
     difficulty: str = Field(description="Difficulty level of the workout (ex: Beginner, Intermediate, Advanced)")
 
@@ -87,18 +88,19 @@ class WorkoutGeneratorService(coach_pb2_grpc.WorkoutGeneratorServiceServicer):
             response = self.llm.invoke(input=prompt)
 
             # Step 3 - Convert the structured LLM response to Pydantic model
-            workout_plan = self.parser.parse(response)
+            workout_plan = self.parser.parse(response.content)
 
             # Step 4 - Convert the Pydantic model to protobuf format
-            exercises = []
-            for exercise in workout_plan.exercise:
-                exercises.append(coach_pb2.Exercise(
+            exercises = [
+                coach_pb2.Exercise(
                     name=exercise.name,
                     sets=exercise.sets,
                     reps=exercise.reps,
                     rest_seconds=exercise.rest_seconds,
                     notes=exercise.notes
-                ))
+                )
+                for exercise in workout_plan.exercises
+            ]
 
             grpc_response = coach_pb2.WorkoutPlan(
                 day=workout_plan.day,
@@ -119,7 +121,7 @@ class WorkoutGeneratorService(coach_pb2_grpc.WorkoutGeneratorServiceServicer):
             return coach_pb2.WorkoutPlan(
                 day="",
                 focus="",
-                exercise=[],
+                exercises=[],
                 total_duration_mins=0,
                 difficulty=""
             )

@@ -13,7 +13,7 @@ def test_coach_chat():
     
     # Connect to the gRPC server
     channel = grpc.insecure_channel('localhost:50051')
-    stub = coach_pb2_grpc.CoachChatStub(channel)
+    stub = coach_pb2_grpc.CoachChatServiceStub(channel)
     
     # Create a user profile
     profile = coach_pb2.UserProfile(
@@ -79,8 +79,8 @@ def test_workout_generator():
     print("=" * 50)
     
     # Connect to the gRPC server
-    channel = grpc.insecure_channel('localhost:50052')
-    stub = coach_pb2_grpc.WorkoutGeneratorStub(channel)
+    channel = grpc.insecure_channel('localhost:50051')
+    stub = coach_pb2_grpc.WorkoutGeneratorServiceStub(channel)
     
     # Create a user profile
     profile = coach_pb2.UserProfile(
@@ -96,10 +96,10 @@ def test_workout_generator():
     request = coach_pb2.WorkoutRequest(
         user_id="test_user_123",
         user_profile=profile,
-        workout_type="upper_body"
+        workout="upper_body"
     )
     
-    print(f"\n📋 Requesting: {request.workout_type} workout")
+    print(f"\n📋 Requesting: {request.workout} workout")
     print(f"Goal: {profile.fitness_goal}")
     print(f"Equipment: {', '.join(profile.equipment)}")
     
@@ -131,7 +131,7 @@ def main():
     print()
     print("Available tests:")
     print("1. CoachChat (port 50051)")
-    print("2. WorkoutGenerator (port 50052)")
+    print("2. WorkoutGenerator (port 50051)")
     print()
     print("Start the servers you want to test:")
     print("  Terminal 1: python services/coach_chat.py")
