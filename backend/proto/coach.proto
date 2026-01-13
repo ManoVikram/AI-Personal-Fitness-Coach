@@ -45,7 +45,7 @@ message WorkoutRequest {
 message WorkoutPlan {
     string day = 1;
     string focus = 2;       // Ex: "Upper body strength" 
-    repeated Exercise exercise = 3;
+    repeated Exercise exercises = 3;
     int32 total_duration_mins = 4;
     string difficulty = 5;  // Ex: "beginner" or "intermediate" or "advanced"
 }
