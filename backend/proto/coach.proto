@@ -107,6 +107,6 @@ message WorkoutLog {
 message ExerciseLog {
     string name = 1;
     repeated int32 reps_per_set = 2;
-    repeated int32 weight_per_set = 3;  // in kg
+    repeated float weight_per_set = 3;  // in kg
     string notes = 4;
 }
