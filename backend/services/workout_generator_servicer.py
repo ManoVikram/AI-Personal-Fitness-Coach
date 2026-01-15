@@ -105,7 +105,7 @@ class WorkoutGeneratorService(coach_pb2_grpc.WorkoutGeneratorServiceServicer):
             grpc_response = coach_pb2.WorkoutPlan(
                 day=workout_plan.day,
                 focus=workout_plan.focus,
-                exercise=exercises,
+                exercises=exercises,
                 total_duration_mins=workout_plan.total_duration_mins,
                 difficulty=workout_plan.difficulty
             )
