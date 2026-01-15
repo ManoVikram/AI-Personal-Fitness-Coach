@@ -125,6 +125,129 @@ def test_workout_generator():
         print(f"❌ Error: {e.code()} - {e.details()}")
         return False
 
+def test_progress_analyzer():
+    """Test the ProgressAnalyzer service"""
+    print("=" * 50)
+    print("\n🧪 Testing ProgressAnalyzer Service...\n")
+    print("=" * 50)
+    
+    # Connect to the gRPC server
+    channel = grpc.insecure_channel('localhost:50051')
+    stub = coach_pb2_grpc.ProgressAnalyzerServiceStub(channel)
+    
+    # Create a user profile
+    profile = coach_pb2.UserProfile(
+        user_id="test_user_123",
+        name="Alex",
+        age=28,
+        fitness_goal="build_muscle",
+        fitness_level="intermediate",
+        equipment=["dumbbells", "pull_up_bar"]
+    )
+    
+    # Create mock workout logs (simulating progress over 2 weeks)
+    workout_logs = [
+        coach_pb2.WorkoutLog(
+            log_id="log_1",
+            date="2026-01-01",
+            exercise_logs=[
+                coach_pb2.ExerciseLog(
+                    name="Push-ups",
+                    reps_per_set=[12, 10, 8],
+                    weight_per_set=[],
+                    notes="Form felt good"
+                ),
+                coach_pb2.ExerciseLog(
+                    name="Dumbbell Curls",
+                    reps_per_set=[10, 10, 8],
+                    weight_per_set=[10.0, 10.0, 10.0],
+                    notes=""
+                )
+            ],
+            duration_mins=45,
+            notes="Good session"
+        ),
+        coach_pb2.WorkoutLog(
+            log_id="log_2",
+            date="2026-01-04",
+            exercise_logs=[
+                coach_pb2.ExerciseLog(
+                    name="Push-ups",
+                    reps_per_set=[15, 12, 10],
+                    weight_per_set=[],
+                    notes="Stronger today!"
+                ),
+                coach_pb2.ExerciseLog(
+                    name="Dumbbell Curls",
+                    reps_per_set=[12, 10, 10],
+                    weight_per_set=[10.0, 10.0, 10.0],
+                    notes=""
+                )
+            ],
+            duration_mins=40,
+            notes=""
+        ),
+        coach_pb2.WorkoutLog(
+            log_id="log_3",
+            date="2026-01-08",
+            exercise_logs=[
+                coach_pb2.ExerciseLog(
+                    name="Push-ups",
+                    reps_per_set=[15, 15, 12],
+                    weight_per_set=[],
+                    notes="Crushed it!"
+                ),
+                coach_pb2.ExerciseLog(
+                    name="Dumbbell Curls",
+                    reps_per_set=[12, 12, 10],
+                    weight_per_set=[12.5, 12.5, 10.0],
+                    notes="Increased weight"
+                )
+            ],
+            duration_mins=42,
+            notes="PR on curls!"
+        )
+    ]
+    
+    # Request analysis
+    request = coach_pb2.ProgressRequest(
+        user_id="test_user_123",
+        user_profile=profile,
+        workout_logs=workout_logs
+    )
+    
+    print(f"\n📊 Analyzing {len(workout_logs)} workouts...")
+    
+    try:
+        response = stub.AnalyzeProgress(request)
+        
+        print(f"\n📈 Progress Analysis:")
+        print(f"\nSummary:\n{response.summary}")
+        
+        if response.insights:
+            print(f"\n💡 Insights ({len(response.insights)}):")
+            for insight in response.insights:
+                impact_emoji = {
+                    "positive": "✅",
+                    "neutral": "ℹ️",
+                    "needs_attention": "⚠️"
+                }.get(insight.impact.lower(), "•")
+                
+                print(f"\n{impact_emoji} {insight.category.upper()}")
+                print(f"   {insight.observation}")
+        
+        if response.recommendations:
+            print(f"\n🎯 Recommendations ({len(response.recommendations)}):")
+            for i, rec in enumerate(response.recommendations, 1):
+                print(f"{i}. {rec}")
+        
+        print("\n✅ ProgressAnalyzer test passed!")
+        return True
+        
+    except grpc.RpcError as e:
+        print(f"❌ Error: {e.code()} - {e.details()}")
+        return False
+
 def main():
     """Run all tests"""
     print("🚀 Starting AI Services Tests")
@@ -132,13 +255,10 @@ def main():
     print("Available tests:")
     print("1. CoachChat (port 50051)")
     print("2. WorkoutGenerator (port 50051)")
-    print()
-    print("Start the servers you want to test:")
-    print("  Terminal 1: python services/coach_chat.py")
-    print("  Terminal 2: python services/workout_generator.py")
+    print("3. ProgressAnalyzer (port 50051)")
     print()
     
-    test_choice = input("Which test? (1=chat, 2=workout, all=both): ").strip().lower()
+    test_choice = input("Which test? (1/2/3/all): ").strip().lower()
     
     # Run tests
     tests_passed = 0
@@ -152,6 +272,11 @@ def main():
     if test_choice in ['2', 'all']:
         tests_total += 1
         if test_workout_generator():
+            tests_passed += 1
+    
+    if test_choice in ['3', 'all']:
+        tests_total += 1
+        if test_progress_analyzer():
             tests_passed += 1
     
     # Summary
