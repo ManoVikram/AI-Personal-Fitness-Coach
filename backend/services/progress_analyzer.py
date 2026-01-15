@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class InsightModel(BaseModel):
     category: str = Field(description="Insight category like strength_trend, consistency, recovery")
     observation: str = Field(description="Specific observation backed by workout data")
-    impact = Literal["positive", "neutral", "needs_attention"]
+    impact: Literal["positive", "neutral", "needs_attention"]
 
 class InsightResponseModel(BaseModel):
     summary: str = Field(description="Insights summary after progress analysis")
