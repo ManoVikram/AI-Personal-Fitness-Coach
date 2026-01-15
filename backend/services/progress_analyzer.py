@@ -1,6 +1,6 @@
 import logging
 from typing import List, Literal
-from proto import coach_pb2_grpc
+from proto import coach_pb2, coach_pb2_grpc
 from utils.llm_client import LLMClient
 from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel, Field
@@ -10,18 +10,18 @@ logger = logging.getLogger(__name__)
 
 
 class InsightModel(BaseModel):
-    category: str = Field("Insight category like strength_trend, consistency, recovery")
+    category: str = Field(description="Insight category like strength_trend, consistency, recovery")
     observation: str = Field(description="Specific observation backed by workout data")
-    impact: str = Literal["positive", "neutral", "needs_attention"]
+    impact = Literal["positive", "neutral", "needs_attention"]
 
 class InsightResponseModel(BaseModel):
     summary: str = Field(description="Insights summary after progress analysis")
     insights: List[InsightModel] = Field(description="All the insights from the LLM")
-    recommendations: List[str] = Field("Actionable advices to reach the goal")
+    recommendations: List[str] = Field(description="Actionable advices to reach the goal")
 
 class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
     def __init__(self):
-        super.__init__()
+        super().__init__()
         self.llm = LLMClient.get_creative_model()
         self.parser = PydanticOutputParser(pydantic_object=InsightResponseModel)
 
@@ -77,7 +77,7 @@ class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
         if not workout_logs:
             return "No workout data available."
         
-        summary = [f"Workout History ({len(workout_logs.exercise_logs)} workouts):\n\n"]
+        summary = [f"Workout History ({len(workout_logs)} workouts):\n\n"]
 
         for log in workout_logs:
             summary.append(f"Date: {log.date} | {log.duration_mins} mins\n")
@@ -93,8 +93,8 @@ class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
                 else:
                     summary.append(f" - {exercise.name}: {len(exercise.reps_per_set)} [{reps_per_set} reps] @ [bodyweight]\n")
 
-                if log.notes:
-                    summary.append(f"Notes:\n{log.notes}\n")
+                if exercise.notes:
+                    summary.append(f"Notes:\n{exercise.notes}\n")
 
         return "\n".join(summary)
 
@@ -108,4 +108,24 @@ class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
         # Step 3 - Get the response from the LLM
         response = self.llm.invoke(input=prompt)
 
-        # Step 4 - 
+        # Step 4 - Parse the LLM response to Pydantic model
+        insights = self.parser.parse(response.content)
+
+        # Step 5 - Convert the Pydantic model to protobuf format
+        insights_list = [
+            coach_pb2.Insight(
+                category=insight.category,
+                observation=insight.observation,
+                impact=insight.impact
+            )
+            for insight in insights.insights
+        ]
+
+        grpc_response = coach_pb2.InsightResponse(
+            summary=insights.summary,
+            insights=insights_list,
+            recommendations=insights.recommendations   
+        )
+
+        # Step 6 - Return the gRPC response
+        return grpc_response
