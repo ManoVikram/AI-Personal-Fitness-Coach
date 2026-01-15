@@ -4,6 +4,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import grpc
 from dotenv import load_dotenv
+from progress_analyzer import ProgressAnalyzerService
 from workout_generator_servicer import WorkoutGeneratorService
 from coach_chat_servicer import CoachChatService
 from proto import coach_pb2_grpc
@@ -23,6 +24,7 @@ def serve():
     # Step 3 - Register the service to the server
     coach_pb2_grpc.add_CoachChatServiceServicer_to_server(servicer=CoachChatService(), server=server)
     coach_pb2_grpc.add_WorkoutGeneratorServiceServicer_to_server(servicer=WorkoutGeneratorService(), server=server)
+    coach_pb2_grpc.add_ProgressAnalyzerServiceServicer_to_server(servicer=ProgressAnalyzerService(), server=server)
 
     # Step 4 - Bind the server to a port
     grpc_port = os.getenv("GRPC_PORT", 50051)
