@@ -1,15 +1,29 @@
 import logging
+from typing import List, Literal
 from proto import coach_pb2_grpc
 from utils.llm_client import LLMClient
+from langchain_core.output_parsers import PydanticOutputParser
+from pydantic import BaseModel, Field
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+class InsightModel(BaseModel):
+    category: str = Field("Insight category like strength_trend, consistency, recovery")
+    observation: str = Field(description="Specific observation backed by workout data")
+    impact: str = Literal["positive", "neutral", "needs_attention"]
+
+class InsightResponseModel(BaseModel):
+    summary: str = Field(description="Insights summary after progress analysis")
+    insights: List[InsightModel] = Field(description="All the insights from the LLM")
+    recommendations: List[str] = Field("Actionable advices to reach the goal")
+
 class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
     def __init__(self):
         super.__init__()
         self.llm = LLMClient.get_creative_model()
+        self.parser = PydanticOutputParser(pydantic_object=InsightResponseModel)
 
     def _build_progress_analyzer_prompt(self, profile, workout_summary, workout_count):
         """
@@ -46,26 +60,13 @@ class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
         - What to change or continue
         - Next steps to reach their goal
 
-        Format your response as:
+        IMPORTANT: Respond ONLY with valid JSON matching this exact format:
+        {self.parser.get_format_instructions()}
 
-        SUMMARY:
-        [2-3 sentence overall assessment]
-
-        INSIGHTS:
-        - Category: strength_trend | Impact: positive/neutral/needs_attention
-        Observation: [what you noticed]
-
-        - Category: consistency | Impact: positive/neutral/needs_attention
-        Observation: [what you noticed]
-
-        [continue for all insights]
-
-        RECOMMENDATIONS:
-        1. [specific actionable advice]
-        2. [specific actionable advice]
-        3. [specific actionable advice]
-
-        Be specific with numbers, dates, and exercises. Reference actual data."""
+        Be specific with numbers, dates, and exercises. Reference actual data.
+        
+        Do not include any markdown formatting, explanations, or text outside the JSON.
+        """
 
         return prompt
 
@@ -103,3 +104,8 @@ class ProgressAnalyzerService(coach_pb2_grpc.ProgressAnalyzerServiceServicer):
 
         # Step 2 - Build the progress analyzer prompt
         prompt = self._build_progress_analyzer_prompt(profile=request.user_profile, workout_summary=workout_summary, workout_count=len(request.workout_logs))
+
+        # Step 3 - Get the response from the LLM
+        response = self.llm.invoke(input=prompt)
+
+        # Step 4 - 
