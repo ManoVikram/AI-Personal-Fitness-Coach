@@ -43,7 +43,7 @@ func main() {
 	progressAnalyzerClient := pb.NewProgressAnalyzerServiceClient(connection)
 
 	// Step 4 - Initialize the services with the gRPC clients
-	services := services.Services{
+	services := &services.Services{
 		CoachChatClient:        coachChatClient,
 		WorkoutGeneratorClient: workoutGeneratorClient,
 		ProgressAnalyzerClient: progressAnalyzerClient,
@@ -53,7 +53,7 @@ func main() {
 	server := gin.Default()
 
 	// Step 6 - Register the routes
-	routes.RegisterRoutes(server, &services)
+	routes.RegisterRoutes(server, services)
 
 	// Step 7 - Start the Gin server
 	log.Fatal(server.Run(":" + httpPort))
