@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Mock data for testing
 var (
 	mockUserProfile = &pb.UserProfile{
 		UserId:       "test-user-123",
