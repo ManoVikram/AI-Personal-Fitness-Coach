@@ -54,13 +54,8 @@ var mockWorkoutLogs = []*pb.WorkoutLog{
 
 func PerformanceAnalyzerHandler(services *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Step 1 - Unmarshall the request body
-		var request models.ProgressRequest
-
-		if err := c.ShouldBindJSON(&request); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid request body: %v", err.Error())})
-			return
-		}
+		// Step 1 - Get the user ID from the URL path params
+		userID := c.Param("user_id")
 
 		// Step 2 - Get the workout logs from DB
 
@@ -68,7 +63,7 @@ func PerformanceAnalyzerHandler(services *services.Services) gin.HandlerFunc {
 
 		// Step 4 - Prepared the gRPC request
 		gRPCRequest := &pb.ProgressRequest{
-			UserId:      request.UserID,
+			UserId:      userID,
 			WorkoutLogs: mockWorkoutLogs,
 			UserProfile: mockUserProfile,
 		}
