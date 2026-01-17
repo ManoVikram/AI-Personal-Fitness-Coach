@@ -14,5 +14,8 @@ func RegisterRoutes(server *gin.Engine, services *services.Services) {
 
 		// POST request to generate workout plan
 		v1.POST("/workout/generate", handlers.WorkoutGeneratorHandler(services))
+
+		// POST request to analyze the progress and generate insights
+		v1.POST("/insights/:user_id", handlers.PerformanceAnalyzerHandler(services))
 	}
 }
