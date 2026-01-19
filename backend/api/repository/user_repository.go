@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+// GetUserProfile fetches a user's profile from database
 func GetUserProfile(ctx context.Context, userID string) (*models.UserProfile, error) {
 	query := `
 		SELECT id, name, age, fitness_goal, fitness_level, equipment, gender
@@ -37,4 +38,24 @@ func GetUserProfile(ctx context.Context, userID string) (*models.UserProfile, er
 	}
 
 	return &profile, nil
+}
+
+// CreateUserProfile creates a new user profile
+func CreateUserProfile(ctx context.Context, profile *models.UserProfile) error {
+	query := `
+		INSERT INTO user_profiles (id, name, age, fitness_goal, fitness_level, equipment, gender)
+		VALUES ($1, $2, $3, $4, $5, $6, $7);
+	`
+
+	_, err := db.Pool.Exec(ctx, query,
+		profile.UserID,
+		profile.Name,
+		profile.Age,
+		profile.FitnessGoal,
+		profile.FitnessLevel,
+		profile.Equipment,
+		profile.Gender,
+	)
+
+	return err
 }
