@@ -59,3 +59,32 @@ func CreateUserProfile(ctx context.Context, profile *models.UserProfile) error {
 
 	return err
 }
+
+// UpdateUserProfile updates and existing user profile
+func UpdateUserProfile(ctx context.Context, profile *models.UserProfile) error {
+	query := `
+		UPDATE user_profiles
+		SET name = $2, age = $3, fitness_goal = $4, fitness_level = $5, equipment = $6, gender = $7
+		WHERE id = $1;
+	`
+
+	result, err := db.Pool.Exec(ctx, query,
+		&profile.UserID,
+		&profile.Name,
+		&profile.Age,
+		&profile.FitnessGoal,
+		&profile.FitnessLevel,
+		&profile.Equipment,
+		&profile.Gender,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return fmt.Errorf("User profile not found")
+	}
+
+	return nil
+}
