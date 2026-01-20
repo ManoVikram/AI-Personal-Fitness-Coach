@@ -46,3 +46,15 @@ func GetChatHistory(ctx context.Context, userID string, limit int) ([]models.Cha
 
 	return messages, nil
 }
+
+// SaveChatMessage saves a chat message to database
+func SaveChatMessage(ctx context.Context, userID string, message models.ChatMessage, tokensUsed int32) error {
+	query := `
+	INSERT INTO chat_messages (user_id, role, content, tokens_used, created_at)
+	VALUES ($1, $2, $3, $4, NOW());
+	`
+
+	_, err := db.Pool.Query(ctx, query, userID, message.Role, message.Content, tokensUsed)
+
+	return err
+}
