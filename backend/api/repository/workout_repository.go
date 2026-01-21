@@ -73,3 +73,40 @@ func getExerciseLogsForWorkout(ctx context.Context, workoutID string) ([]models.
 
 	return exerciseLogs, nil
 }
+
+// SaveWorkoutLog saves a workout log with exercises
+func SaveWorkoutLog(ctx context.Context, workoutLog models.WorkoutLog) error {
+	// A transaction because saving a workout without all its exercises (or vice versa) would corrupt your data.
+	// Transactions guarantee all-or-nothing consistency.
+	// An exercise log should never exist without its workout log.
+	tx, err := db.Pool.Begin(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback(ctx)
+
+	query := `
+	INSERT INTO workout_logs (id, user_id, date, duration_mins, notes)
+	VALUES ($1, $2, $3, $4, $5);
+	`
+
+	_, err = tx.Exec(ctx, query, workoutLog.LogID, workoutLog.UserID, workoutLog.Date, workoutLog.DurationMins, workoutLog.Notes)
+	if err != nil {
+		return err
+	}
+
+	query = `
+	INSERT INTO exercise_logs (workout_log_id, name, reps_per_set, weights_per_set, notes)
+	VALUES ($1, $2, $3, $4, $5);
+	`
+
+	for _, exerciseLog := range workoutLog.ExerciseLogs {
+		_, err = tx.Exec(ctx, query, workoutLog.LogID, exerciseLog.Name, exerciseLog.RepsPerSet, exerciseLog.WeightPerSet, exerciseLog.Notes)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Commit makes everything permanent
+	return tx.Commit(ctx)
+}
