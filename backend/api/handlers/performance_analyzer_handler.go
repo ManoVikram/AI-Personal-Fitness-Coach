@@ -6,66 +6,69 @@ import (
 
 	"github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/models"
 	pb "github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/proto"
+	"github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/repository"
 	"github.com/ManoVikram/AI-Personal-Fitness-Coach/backend/api/services"
 	"github.com/gin-gonic/gin"
 )
 
-// Mock workout logs for testing
-var mockWorkoutLogs = []*pb.WorkoutLog{
-	{
-		LogId: "log-1",
-		Date:  "2026-01-10",
-		ExerciseLogs: []*pb.ExerciseLog{
-			{
-				Name:         "Push-ups",
-				RepsPerSet:   []int32{12, 10, 8},
-				WeightPerSet: []float32{},
-				Notes:        "Form felt good",
-			},
-			{
-				Name:         "Dumbbell Curls",
-				RepsPerSet:   []int32{10, 10, 8},
-				WeightPerSet: []float32{10.0, 10.0, 10.0},
-			},
-		},
-		DurationMins: 45,
-		Notes:        "Good session",
-	},
-	{
-		LogId: "log-2",
-		Date:  "2026-01-13",
-		ExerciseLogs: []*pb.ExerciseLog{
-			{
-				Name:         "Push-ups",
-				RepsPerSet:   []int32{15, 12, 10},
-				WeightPerSet: []float32{},
-				Notes:        "Stronger today!",
-			},
-			{
-				Name:         "Dumbbell Curls",
-				RepsPerSet:   []int32{12, 10, 10},
-				WeightPerSet: []float32{12.5, 12.5, 10.0},
-				Notes:        "Increased weight",
-			},
-		},
-		DurationMins: 40,
-	},
-}
-
 func PerformanceAnalyzerHandler(services *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Step 1 - Get the user ID from the URL path params
-		userID := c.Param("user_id")
+		// Step 1 - Get the user ID from JWT (set by auth middleware)
+		userID, exists := c.Get("user_id")
+		if !exists {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "User not authenticated"})
+			return
+		}
 
-		// Step 2 - Get the workout logs from DB
+		// Step 2 - Get the user profile from DB
+		userProfile, err := repository.GetUserProfile(c.Request.Context(), userID.(string))
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User profile not found. Please create a profile."})
+			return
+		}
 
-		// Step 3 - Get the user profile from DB
+		// Step 3 - Get the workout logs from DB
+		workoutLogs, err := repository.GetWorkoutLogs(c.Request.Context(), userID.(string), 10)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("Failed to fetch workout logs: %v", err.Error())})
+			return
+		}
+
+		// Step 4 - Convert workout logs to protobuf format
+		var protobufWorkoutLogs []*pb.WorkoutLog
+		for _, workoutLog := range workoutLogs {
+			var protobufExerciseLogs []*pb.ExerciseLog
+			for _, exerciseLog := range workoutLog.ExerciseLogs {
+				protobufExerciseLogs = append(protobufExerciseLogs, &pb.ExerciseLog{
+					Name:         exerciseLog.Name,
+					RepsPerSet:   exerciseLog.RepsPerSet,
+					WeightPerSet: exerciseLog.WeightPerSet,
+					Notes:        exerciseLog.Notes,
+				})
+			}
+
+			protobufWorkoutLogs = append(protobufWorkoutLogs, &pb.WorkoutLog{
+				LogId:        workoutLog.LogID,
+				Date:         workoutLog.Date,
+				ExerciseLogs: protobufExerciseLogs,
+				DurationMins: workoutLog.DurationMins,
+				Notes:        workoutLog.Notes,
+			})
+		}
 
 		// Step 4 - Prepared the gRPC request
 		gRPCRequest := &pb.ProgressRequest{
-			UserId:      userID,
-			WorkoutLogs: mockWorkoutLogs,
-			UserProfile: mockUserProfile,
+			UserId:      userID.(string),
+			WorkoutLogs: protobufWorkoutLogs,
+			UserProfile: &pb.UserProfile{
+				UserId:       userID.(string),
+				Name:         userProfile.Name,
+				Age:          userProfile.Age,
+				FitnessGoal:  userProfile.FitnessGoal,
+				FitnessLevel: userProfile.FitnessGoal,
+				Equipment:    userProfile.Equipment,
+				Gender:       userProfile.Gender,
+			},
 		}
 
 		// Step 5 - Call the gRPC method to get progress insights
