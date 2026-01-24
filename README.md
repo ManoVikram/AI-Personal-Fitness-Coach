@@ -10,7 +10,7 @@ All the necessary Python pacakges are added to the [requirements.txt](/backend/s
 pip3 install -r requirements.txt
 ```
 
-The below command installs the necessary Go gRPC packages.
+The below commands installs the necessary Go gRPC packages.
 
 ```bash
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -23,7 +23,7 @@ Add the installed Go protoc-gen-go package to PATH
 export PATH="$PATH:$(go env GOPATH)/bin"
 ```
 
-The below command installs the necessary Go project dependencies
+The below commands gets the necessary Go project dependencies
 
 ```bash
 go get github.com/gin-gonic/gin
