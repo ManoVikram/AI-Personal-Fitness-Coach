@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetProfileHandler retrieves a user's profile
 func GetProfileHandler(services *services.Services) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Step 1 - Get user ID from JWT (set by auth middleware)
