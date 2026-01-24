@@ -25,6 +25,12 @@ func RegisterRoutes(server *gin.Engine, services *services.Services) {
 	protected := v1.Group("")
 	protected.Use(middleware.AuthMiddleware())
 	{
+		// GET request to get user profile
+		protected.GET("/profile", handlers.GetProfileHandler(services))
+
+		// POST request to create user profile
+		protected.POST("/profile", handlers.CreateProfileHandler(services))
+
 		// POST request to chat with AI coach
 		protected.POST("/chat", handlers.CoachChatHandler(services))
 
