@@ -10,6 +10,13 @@ class App extends StatelessWidget {
     return MaterialApp(
       title: "Oh Fit",
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.blue,
+          brightness: Brightness.light,
+        ),
+        useMaterial3: true,
+      ),
       initialRoute: AuthScreen.route,
       routes: {AuthScreen.route: (_) => const AuthScreen()},
     );

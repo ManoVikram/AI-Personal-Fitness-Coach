@@ -2,6 +2,9 @@ class Constants {
   static const String supabaseProjectID = String.fromEnvironment(
     "SUPABASE_PROJECT_ID",
   );
+  static const String supabaseProjectURL = String.fromEnvironment(
+    "SUPABASE_PROJECT_URL",
+  );
   static const String supabasePublishableKey = String.fromEnvironment(
     "SUPABASE_PUBLISHABLE_KEY",
   );
