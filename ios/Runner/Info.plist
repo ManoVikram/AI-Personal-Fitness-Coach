@@ -48,14 +48,6 @@
 		<string>Editor</string>
 		<key>CFBundleURLSchemes</key>
 		<array>
-		<string>com.googleusercontent.apps.709264346781-l8l15gt7eb2eihgq90kkm1fgtmu18ju1</string>
-		</array>
-	</dict>
-	<dict>
-		<key>CFBundleTypeRole</key>
-		<string>Editor</string>
-		<key>CFBundleURLSchemes</key>
-		<array>
 		<string>wllrqnwlkaeocbqtlfez</string>
 		</array>
 	</dict>
