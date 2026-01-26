@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class AuthScreen extends StatelessWidget {
-  const AuthScreen({super.key});
-
   static const String route = "/auth";
+
+  const AuthScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
