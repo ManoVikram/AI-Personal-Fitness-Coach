@@ -1,7 +1,8 @@
-import 'package:ai_personal_fitness_coach/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+
+import '../providers/auth_provider.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   static const String route = "/auth";
@@ -20,18 +21,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     try {
       final AuthService authService = ref.watch(authServiceProvider);
-      final bool isSuccess = await authService.signInWithGoogle();
 
-      if (!isSuccess && mounted) {
+      // This will open the browser for OAuth
+      // It doesn't return success/failure - browser opens or error is thrown
+      await authService.signInWithGoogle();
+
+      debugPrint("✅ Browser opened for Google login");
+      // If success, authStateProvider will automatically trigger navigation
+      // via the App widget (app.dart) watching the auth state
+    } catch (error) {
+      // Only show error if OAuth flow failed to start
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Sign in falied. Please try again."),
+          SnackBar(
+            content: Text("Failed to start sign in: $error"),
             backgroundColor: Colors.red,
           ),
         );
       }
-      // If success, authStateProvider will automatically trigger navigation
-      // via the App widget (app.dart) watching the auth state
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

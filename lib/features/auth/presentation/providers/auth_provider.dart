@@ -45,16 +45,30 @@ class AuthService {
   Session? get currentSession => _supabase.auth.currentSession;
 
   // Sign in with Google
-  Future<bool> signInWithGoogle() async {
+  Future<void> signInWithGoogle() async {
     try {
+      log("🔐 Starting Google OAuth...", name: "auth");
+      log(
+        "Redirect URL: ${Constants.supabaseProjectID}://login-callback",
+        name: "auth",
+      );
+
       await _supabase.auth.signInWithOAuth(
         OAuthProvider.google,
         redirectTo: "${Constants.supabaseProjectID}://login-callback",
       );
-      return true;
-    } catch (error) {
-      log("Sign in error: $error");
-      return false;
+
+      log("✅ OAuth flow initiated - browser should open", name: "auth");
+      // Note: This doesn't mean login succeeded!
+      // Success is determined by authStateProvider updating
+    } catch (error, stackTrace) {
+      log(
+        "❌ Sign in error",
+        name: "auth",
+        error: error,
+        stackTrace: stackTrace,
+      );
+      rethrow; // Re-throw so UI can handle it
     }
   }
 
