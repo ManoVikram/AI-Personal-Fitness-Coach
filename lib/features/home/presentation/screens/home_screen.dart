@@ -5,11 +5,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../auth/presentation/screens/auth_screen.dart';
 import '../../../auth/providers/auth_provider.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final int _currentIndex = 0;
+
+  final List<Widget> _tabs = [];
+
+  @override
+  Widget build(BuildContext context) {
     final User? user = ref.watch(currentUserProvider);
 
     return Scaffold(
@@ -60,6 +69,7 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+      body: IndexedStack(index: _currentIndex, children: _tabs),
     );
   }
 }
