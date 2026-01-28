@@ -13,7 +13,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  final int _currentIndex = 0;
+  int _currentIndex = 0;
 
   final List<Widget> _tabs = [];
 
@@ -70,6 +70,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ],
       ),
       body: IndexedStack(index: _currentIndex, children: _tabs),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.chat_bubble_outline),
+            selectedIcon: Icon(Icons.chat_bubble),
+            label: "Chat",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.fitness_center_outlined),
+            selectedIcon: Icon(Icons.fitness_center),
+            label: "Workout",
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.insights_outlined),
+            selectedIcon: Icon(Icons.insights),
+            label: "Insights",
+          ),
+        ],
+      ),
     );
   }
 }
