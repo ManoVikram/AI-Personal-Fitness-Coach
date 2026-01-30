@@ -139,4 +139,27 @@ class ApiRepository {
       rethrow;
     }
   }
+
+  // Get /api/v1/profile
+  Future<Map<String, dynamic>> getProfile() async {
+    try {
+      log("📤 Fetching profile: ${dio.options.baseUrl}/profile");
+
+      final Response response = await dio.get("/profile");
+
+      log("📤 Response status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception("Failed to get profile: ${response.statusCode}");
+      }
+    } on DioException catch (error) {
+      log("❌ Dio error fetching profile: $error");
+      rethrow;
+    } catch (error) {
+      log("❌ Error fetching profile: $error");
+      rethrow;
+    }
+  }
 }
