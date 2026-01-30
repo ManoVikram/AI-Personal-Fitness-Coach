@@ -99,4 +99,44 @@ class ApiRepository {
       rethrow;
     }
   }
+
+  // POST /api/v1/profile (Create/Update)
+  Future<Map<String, dynamic>> saveProfile({
+    required String name,
+    required int age,
+    required String fitnessGoal,
+    required String fitnessLevel,
+    required List<String> equipment,
+    String? gender,
+  }) async {
+    try {
+      log("📤 Saving profile: ${dio.options.baseUrl}/profile");
+
+      final Response response = await dio.post(
+        "/profile",
+        data: {
+          "name": name,
+          "age": age,
+          "fitnessGoal": fitnessGoal,
+          "fitnessLevel": fitnessLevel,
+          "equipment": equipment,
+          "gender": gender,
+        },
+      );
+
+      log("📤 Response status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception("Failed to save profile: ${response.statusCode}");
+      }
+    } on DioException catch (error) {
+      log("❌ Dio error saving profile: $error");
+      rethrow;
+    } catch (error) {
+      log("❌ Error saving profile: $error");
+      rethrow;
+    }
+  }
 }
