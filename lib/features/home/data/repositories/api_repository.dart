@@ -69,10 +69,33 @@ class ApiRepository {
         throw Exception("Failed to generate workout: ${response.statusCode}");
       }
     } on DioException catch (error) {
-      log("❌ Dio error sending chat message: ${error.message}");
+      log("❌ Dio error generating workout: ${error.message}");
       rethrow;
     } catch (error) {
       log("Error generating workout: $error");
+      rethrow;
+    }
+  }
+
+  // GET /api/v1/insights
+  Future<Map<String, dynamic>> getInsights() async {
+    try {
+      log("📤 Fetching insights: ${dio.options.baseUrl}/insights");
+
+      final Response response = await dio.get("/insights");
+
+      log("📥 Response status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception("Failed to get insights: ${response.statusCode}");
+      }
+    } on DioException catch (error) {
+      log("❌ Dio error getting insights: ${error.message}");
+      rethrow;
+    } catch (error) {
+      log("❌ Error gertting insights: $error");
       rethrow;
     }
   }
