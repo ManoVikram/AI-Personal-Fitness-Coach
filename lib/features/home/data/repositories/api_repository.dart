@@ -28,7 +28,10 @@ class ApiRepository {
     try {
       log("📤 Sending chat message to: ${dio.options.baseUrl}/chat");
 
-      final response = await dio.post("/chat", data: {"message": message});
+      final Response response = await dio.post(
+        "/chat",
+        data: {"message": message},
+      );
 
       log("📥 Response status: ${response.statusCode}");
 
@@ -44,6 +47,32 @@ class ApiRepository {
       rethrow;
     } catch (error) {
       log("❌ Error sending chat message: $error");
+      rethrow;
+    }
+  }
+
+  // POST /api/v1/workouts/generate
+  Future<Map<String, dynamic>> generateWorkout(String workoutType) async {
+    try {
+      log("📤 Generating workout: ${dio.options.baseUrl}/workouts/generate");
+
+      final Response response = await dio.post(
+        "/workouts/geenrate",
+        data: {"workout": workoutType},
+      );
+
+      log("📥 Response status: ${response.statusCode}");
+
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      } else {
+        throw Exception("Failed to generate workout: ${response.statusCode}");
+      }
+    } on DioException catch (error) {
+      log("❌ Dio error sending chat message: ${error.message}");
+      rethrow;
+    } catch (error) {
+      log("Error generating workout: $error");
       rethrow;
     }
   }
