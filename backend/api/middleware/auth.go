@@ -65,7 +65,7 @@ func verifyJWT(ctx context.Context, tokenString string) (jwt.Token, error) {
 		[]byte(tokenString),
 		jwt.WithKeySet(keyset),
 		jwt.WithValidate(true),
-		jwt.WithIssuer(fmt.Sprintf("http://%s.supabase.co/auth/v1", os.Getenv("SUPABASE_PROJECT_ID"))),
+		jwt.WithIssuer(fmt.Sprintf("https://%s.supabase.co/auth/v1", os.Getenv("SUPABASE_PROJECT_ID"))),
 		jwt.WithAudience("authenticated"),
 	)
 	if err != nil {

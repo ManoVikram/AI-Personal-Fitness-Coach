@@ -10,7 +10,7 @@ import (
 // GetChatHistory retrieves last N chat messages for a user
 func GetChatHistory(ctx context.Context, userID string, limit int) ([]models.ChatMessage, error) {
 	query := `
-	SELECT role, content, timestamp
+	SELECT role, content, created_at
 	FROM chat_messages
 	WHERE user_id = $1
 	ORDER BY created_at DESC
