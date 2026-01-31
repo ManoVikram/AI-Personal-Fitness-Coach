@@ -10,7 +10,7 @@ class ChatMessage {
   });
 
   // JSON serialization
-  factory ChatMessage.fromJSON(Map<String, dynamic> json) {
+  factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       role: json["role"],
       content: json["content"],
@@ -18,7 +18,7 @@ class ChatMessage {
     );
   }
 
-  Map<String, dynamic> toJSON() {
+  Map<String, dynamic> toJson() {
     return {"role": role, "content": content, "timestamp": timestamp};
   }
 }
