@@ -8,4 +8,17 @@ class ChatMessage {
     required this.content,
     required this.timestamp,
   });
+
+  // JSON serialization
+  factory ChatMessage.fromJSON(Map<String, dynamic> json) {
+    return ChatMessage(
+      role: json["role"],
+      content: json["content"],
+      timestamp: DateTime.parse(json["timestamp"]),
+    );
+  }
+
+  Map<String, dynamic> toJSON() {
+    return {"role": role, "content": content, "timestamp": timestamp};
+  }
 }
