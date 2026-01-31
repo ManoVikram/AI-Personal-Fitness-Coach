@@ -35,15 +35,10 @@ class ApiRepository {
 
       log("📥 Response status: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
-      } else {
-        throw Exception(
-          "Failed to send message: ${response.statusCode} - ${response.data}",
-        );
-      }
+      return response.data as Map<String, dynamic>;
     } on DioException catch (error) {
       log("❌ Dio error sending chat message: ${error.message}");
+      log("❌ Resonse: ${error.response?.data}");
       rethrow;
     } catch (error) {
       log("❌ Error sending chat message: $error");
@@ -57,22 +52,19 @@ class ApiRepository {
       log("📤 Generating workout: ${dio.options.baseUrl}/workouts/generate");
 
       final Response response = await dio.post(
-        "/workouts/geenrate",
+        "/workouts/generate",
         data: {"workout": workoutType},
       );
 
       log("📥 Response status: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
-      } else {
-        throw Exception("Failed to generate workout: ${response.statusCode}");
-      }
+      return response.data as Map<String, dynamic>;
     } on DioException catch (error) {
       log("❌ Dio error generating workout: ${error.message}");
+      log("❌ Resonse: ${error.response?.data}");
       rethrow;
     } catch (error) {
-      log("Error generating workout: $error");
+      log("❌ Error generating workout: $error");
       rethrow;
     }
   }
@@ -86,13 +78,10 @@ class ApiRepository {
 
       log("📥 Response status: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
-      } else {
-        throw Exception("Failed to get insights: ${response.statusCode}");
-      }
+      return response.data as Map<String, dynamic>;
     } on DioException catch (error) {
       log("❌ Dio error getting insights: ${error.message}");
+      log("❌ Resonse: ${error.response?.data}");
       rethrow;
     } catch (error) {
       log("❌ Error gertting insights: $error");
@@ -126,13 +115,10 @@ class ApiRepository {
 
       log("📤 Response status: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
-      } else {
-        throw Exception("Failed to save profile: ${response.statusCode}");
-      }
+      return response.data as Map<String, dynamic>;
     } on DioException catch (error) {
       log("❌ Dio error saving profile: $error");
+      log("❌ Resonse: ${error.response?.data}");
       rethrow;
     } catch (error) {
       log("❌ Error saving profile: $error");
@@ -149,13 +135,10 @@ class ApiRepository {
 
       log("📤 Response status: ${response.statusCode}");
 
-      if (response.statusCode == 200) {
-        return response.data as Map<String, dynamic>;
-      } else {
-        throw Exception("Failed to get profile: ${response.statusCode}");
-      }
+      return response.data as Map<String, dynamic>;
     } on DioException catch (error) {
       log("❌ Dio error fetching profile: $error");
+      log("❌ Resonse: ${error.response?.data}");
       rethrow;
     } catch (error) {
       log("❌ Error fetching profile: $error");
