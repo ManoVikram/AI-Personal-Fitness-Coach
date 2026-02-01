@@ -50,3 +50,13 @@ Run the below command from the /backend folder to generate the Go gRPC files.
 ```bash
 protoc --proto_path=./proto --go_out=./api/proto --go_opt=paths=source_relative --go-grpc_out=./api/proto --go-grpc_opt=paths=source_relative ./proto/coach.proto
 ```
+
+## Run the gRPC & Gin servers
+
+```bash
+python3 server.py
+```
+
+```bash
+go run .
+```
