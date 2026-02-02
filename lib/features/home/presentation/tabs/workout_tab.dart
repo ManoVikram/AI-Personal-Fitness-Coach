@@ -5,6 +5,7 @@ import '../../data/repositories/api_repository.dart';
 import '../../domain/models/workout_plan.dart';
 import '../../providers/api_provider.dart';
 import '../widgets/workout_selector.dart';
+import '../widgets/workout_view.dart';
 
 class WorkoutTab extends ConsumerStatefulWidget {
   const WorkoutTab({super.key});
@@ -52,6 +53,17 @@ class _WorkoutTabState extends ConsumerState<WorkoutTab> {
 
   @override
   Widget build(BuildContext context) {
+    if (_currentWorkout != null) {
+      return WorkoutView(
+        currentWorkout: _currentWorkout!,
+        onBack: () {
+          setState(() {
+            _currentWorkout = null;
+          });
+        },
+      );
+    }
+
     return WorkoutSelector(
       isGenerating: _isGenerating,
       generateWorkout: _generateWorkout,
