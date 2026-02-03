@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../auth/presentation/screens/auth_screen.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../tabs/chat_tab.dart';
+import '../tabs/workout_tab.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -16,7 +17,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _tabs = [ChatTab()];
+  final List<Widget> _tabs = [ChatTab(), WorkoutTab()];
 
   @override
   Widget build(BuildContext context) {

@@ -63,7 +63,7 @@ class WorkoutSelector extends StatelessWidget {
 
           WorkoutTypeCard(
             isGenerating: _isGenerating,
-            title: "Coare & Abs",
+            title: "Core & Abs",
             subtitle: "Core strength",
             icon: Icons.favorite,
             color: Colors.red,

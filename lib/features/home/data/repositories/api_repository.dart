@@ -46,13 +46,13 @@ class ApiRepository {
     }
   }
 
-  // POST /api/v1/workouts/generate
+  // POST /api/v1/workout/generate
   Future<Map<String, dynamic>> generateWorkout(String workoutType) async {
     try {
-      log("📤 Generating workout: ${dio.options.baseUrl}/workouts/generate");
+      log("📤 Generating workout: ${dio.options.baseUrl}/workout/generate");
 
       final Response response = await dio.post(
-        "/workouts/generate",
+        "/workout/generate",
         data: {"workout": workoutType},
       );
 
