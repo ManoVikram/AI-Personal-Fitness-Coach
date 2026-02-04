@@ -20,7 +20,7 @@ class InsightsTab extends ConsumerWidget {
       return Center(child: Text("Not authenticated"));
     }
 
-    return FutureBuilder(
+    return FutureBuilder<Map<String, dynamic>>(
       future: apiRepository.getInsights(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -50,6 +50,15 @@ class InsightsTab extends ConsumerWidget {
         final ProgressInsights insights = ProgressInsights.fromJson(
           snapshot.data!,
         );
+
+        if (insights.insights.isEmpty && insights.recommendations.isEmpty) {
+          return NoDataState(
+            message: insights.summary.isNotEmpty
+                ? insights.summary
+                : "No workout data yet. Start logging workouts to get insights!",
+          );
+        }
+
         return InsightView(insights: insights);
       },
     );
