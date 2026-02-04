@@ -2,6 +2,24 @@
 
 Personal fitness coach app that can track your workouts and analyze and provide insights and workout plans to achieve your fitness goals. Built with Flutter for UI, Go for backend, Supabase for DB and Auth, Python for AI microservices and gRPC for communication between Go and Python.
 
+## Architecture
+- Flutter (mobile)
+- Go (API gateway + auth)
+- Python (AI microservices)
+- PostgreSQL (Supabase)
+- gRPC (service communication)
+
+## Features
+- 💬 Real-time AI coaching
+- 🏋️ Personalized workout generation
+- 📊 Progress insights & analysis
+
+## Tech Stack
+- LangChain + OpenAI
+- Riverpod (state management)
+- JWT with JWKS verification
+- Clean architecture
+
 ## Install the Necessary Packages
 
 All the necessary Python pacakges are added to the [requirements.txt](/backend/services/requirements.txt) file. Run the below command to install all the packages from this file.
@@ -59,4 +77,10 @@ python3 server.py
 
 ```bash
 go run .
+```
+
+## Run Flutter app
+
+```bash
+flutter run lib/main.dart
 ```
